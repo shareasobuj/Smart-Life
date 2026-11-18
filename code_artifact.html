@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>স্মার্ট লাইফ ডিসিশন মেকার | দৈনন্দিন জীবনের স্মার্ট সমাধান</title>
+    
+    <!-- Tailwind CSS লোড করা হচ্ছে -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- বাংলা সুন্দর ফন্ট (Hind Siliguri) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome আইকন -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js (সেভিংস সিমুলেটরের লাইভ চার্টের জন্য) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #fdf2f8 100%);
+            min-height: 100vh;
+        }
+
+        /* কাস্টম স্ক্রলবার */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* রেঞ্জ স্লাইডার কাস্টমাইজেশন */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
+            transition: transform 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 5px;
+        }
+
+        /* স্মুথ ফেইড-ইন অ্যানিমেশন */
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* কাস্টম মেসেজ টোস্ট */
+        #toast-box {
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased flex flex-col justify-between">
+
+    <!-- নেভিগেশন বার -->
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/70 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- লোগো -->
+                <div onclick="switchTab('home')" class="flex items-center gap-3 cursor-pointer group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-700">স্মার্ট লাইফ</span>
+                        <span class="block text-[11px] font-medium text-slate-500 -mt-1">ডিসিশন মেকার</span>
+                    </div>
+                </div>
+
+                <!-- ডেস্কটপ নেভিগেশন মেনু -->
+                <nav class="hidden md:flex items-center gap-2 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/60">
+                    <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white text-indigo-600 shadow-sm">
+                        <i class="fa-solid fa-house mr-1.5"></i>হোম
+                    </button>
+                    <button onclick="switchTab('bazar')" id="nav-bazar" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:text-indigo-600">
+                        <i class="fa-solid fa-basket-shopping mr-1.5"></i>বাজার ও মেনু
+                    </button>
+                    <button onclick="switchTab('savings')" id="nav-savings" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:text-indigo-600">
+                        <i class="fa-solid fa-piggy-bank mr-1.5"></i>সেভিংস সিমুলেটর
+                    </button>
+                    <button onclick="switchTab('house')" id="nav-house" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-600 hover:text-indigo-600">
+                        <i class="fa-solid fa-building mr-1.5"></i>বাড়ি নির্মাণ খরচ
+                    </button>
+                </nav>
+
+                <!-- মোবাইল মেনু বাটন -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                        <i class="fa-solid fa-bars text-lg" id="mobile-menu-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- মোবাইল ড্রপডাউন মেনু -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1.5 shadow-lg">
+            <button onclick="switchTab('home'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl text-base font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-3">
+                <i class="fa-solid fa-house w-5 text-indigo-500"></i> হোমপেজ
+            </button>
+            <button onclick="switchTab('bazar'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl text-base font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 flex items-center gap-3">
+                <i class="fa-solid fa-basket-shopping w-5 text-emerald-500"></i> স্মার্ট বাজার ও মেনু জেনারেটর
+            </button>
+            <button onclick="switchTab('savings'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-3">
+                <i class="fa-solid fa-piggy-bank w-5 text-blue-500"></i> সংসার ও ভবিষ্যৎ সেভিংস সিমুলেটর
+            </button>
+            <button onclick="switchTab('house'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl text-base font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-600 flex items-center gap-3">
+                <i class="fa-solid fa-building w-5 text-amber-500"></i> বাড়ি তৈরির খরচ ক্যালকুলেটর
+            </button>
+        </div>
+    </header>
+
+    <!-- কাস্টম নোটিফিকেশন টোস্ট -->
+    <div id="toast-box" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 pointer-events-none bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-medium">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-message">কপি করা হয়েছে!</span>
+    </div>
+
+    <!-- মূল কন্টেন্ট এরিয়া -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ========================================== -->
+        <!-- ১. হোমপেজ সেকশন (HOME SECTION)             -->
+        <!-- ========================================== -->
+        <section id="section-home" class="tab-section fade-in space-y-12">
+            <!-- হিরো ব্যানার -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white p-8 sm:p-12 lg:p-16 shadow-xl">
+                <div class="absolute top-0 right-0 -mt-16 -mr-16 w-72 h-72 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="absolute bottom-0 left-0 -mb-16 -ml-16 w-72 h-72 bg-indigo-900/20 rounded-full blur-2xl"></div>
+                
+                <div class="relative z-10 max-w-3xl space-y-6">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-sm font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        বাংলাদেশের প্রেক্ষাপটে তৈরি স্মার্ট লাইফস্টাইল টুলস
+                    </div>
+                    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+                        দৈনন্দিন জীবনের কঠিন সিদ্ধান্ত নিন <span class="text-amber-300">নিমিষেই ও নির্ভুলভাবে!</span>
+                    </h1>
+                    <p class="text-base sm:text-lg text-indigo-100 leading-relaxed max-w-2xl">
+                        আজকের বাজারের বাজেট পরিকল্পনা, মাসিক সংসারের সঞ্চয় হিসাব কিংবা স্বপ্নের বাড়ি নির্মাণের ইট-বালু-রডের হিসাব—সবকিছু এখন এক প্ল্যাটফর্মে। নিচের যেকোনো টুল বেছে নিয়ে কাজ শুরু করুন।
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-4">
+                        <button onclick="switchTab('bazar')" class="px-6 py-3.5 rounded-2xl bg-white text-indigo-700 font-bold shadow-lg hover:bg-indigo-50 hover:scale-105 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-rocket"></i> এখনই শুরু করুন
+                        </button>
+                        <button onclick="document.getElementById('tools-grid').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3.5 rounded-2xl bg-indigo-800/40 hover:bg-indigo-800/60 border border-white/25 text-white font-semibold transition-all">
+                            সবগুলো টুল দেখুন <i class="fa-solid fa-arrow-down ml-1.5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ৩টি ফিচার টুল কার্ড -->
+            <div id="tools-grid" class="space-y-6">
+                <div class="text-center max-w-2xl mx-auto">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">আমাদের স্মার্ট টুলসমূহ</h2>
+                    <p class="text-slate-500 mt-2">আপনার প্রয়োজন অনুযায়ী নিচের যেকোনো কার্ডে ক্লিক করুন</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                    <!-- কার্ড ১: বাজার ও মেনু -->
+                    <div onclick="switchTab('bazar')" class="group cursor-pointer bg-white rounded-3xl p-7 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-basket-shopping"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">১. স্মার্ট বাজার ও মেনু জেনারেটর</h3>
+                            <p class="text-slate-600 mt-3 text-sm leading-relaxed">
+                                হাতের বাজেট এবং পরিবারের সদস্য সংখ্যা দিন। বর্তমান বাজারদর অনুযায়ী সেরা বাজারের লিস্ট ও দুপুর-রাতের রান্নার দারুণ মেনু পেয়ে যান।
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-emerald-600 font-semibold text-sm">
+                            <span>টুলটি ব্যবহার করুন</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- কার্ড ২: সেভিংস সিমুলেটর -->
+                    <div onclick="switchTab('savings')" class="group cursor-pointer bg-white rounded-3xl p-7 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-chart-pie"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors">২. সংসার ও ভবিষ্যৎ সেভিংস সিমুলেটর</h3>
+                            <p class="text-slate-600 mt-3 text-sm leading-relaxed">
+                                আপনার মাসিক আয় ও বসবাসের শহর সিলেক্ট করুন। স্লাইডার ঘুরিয়ে দেখুন বাড়িভাড়া ও খরচের পর মাসে ও ৫ বছরে কত টাকা সঞ্চয় হবে।
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-blue-600 font-semibold text-sm">
+                            <span>হিসাব কষুন</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- কার্ড ৩: বাড়ি তৈরির খরচ -->
+                    <div onclick="switchTab('house')" class="group cursor-pointer bg-white rounded-3xl p-7 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mb-6 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-trowel-bricks"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-600 transition-colors">৩. বাড়ি তৈরির খরচ ক্যালকুলেটর</h3>
+                            <p class="text-slate-600 mt-3 text-sm leading-relaxed">
+                                জমির পরিমাণ (শতাংশ বা স্কয়ার ফিট) ও তলার সংখ্যা দিন। বাড়ি তৈরিতে কতটি ইট, কত বস্তা সিমেন্ট, রড ও আনুমানিক টাকা লাগবে তা জেনে নিন।
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-amber-600 font-semibold text-sm">
+                            <span>খরচ বের করুন</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- ২. স্মার্ট বাজার ও মেনু জেনারেটর (BAZAR & MENU GENERATOR)   -->
+        <!-- ========================================================= -->
+        <section id="section-bazar" class="tab-section hidden fade-in space-y-8">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">স্মার্ট বাজার ও মেনু জেনারেটর</h2>
+                            <p class="text-sm text-slate-500">বাজেট ও সদস্য সংখ্যা অনুযায়ী আজকের সেরা বাজার লিস্ট ও রান্নার আইডিয়া</p>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('home')" class="self-start sm:self-auto px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> ফিরে যান
+                    </button>
+                </div>
+
+                <!-- ইনপুট ফর্ম -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mt-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">আজকের বাজেট (টাকা)</label>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-3 text-slate-400 font-bold">৳</span>
+                            <input type="number" id="bazar-budget" value="600" min="100" step="50" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none font-semibold text-slate-800" placeholder="যেমন: ৫০০">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">সদস্য সংখ্যা (জন)</label>
+                        <input type="number" id="bazar-members" value="4" min="1" max="30" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none font-semibold text-slate-800" placeholder="যেমন: ৪">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">খাবারের ধরন</label>
+                        <select id="bazar-type" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none font-semibold text-slate-800 bg-white">
+                            <option value="balanced">ব্যালেন্সড (মাছ/ডিম + সবজি)</option>
+                            <option value="special">স্পেশাল / মাংস ও পোলাও</option>
+                            <option value="budget">সাশ্রয়ী (ডিম, ডাল ও ভর্তা-সবজি)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-end">
+                        <button onclick="generateBazarPlan()" class="w-full py-2.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-sparkles"></i> লিস্ট তৈরি করুন
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- আউটপুট রেজাল্ট -->
+            <div id="bazar-result" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- বাম কলাম: বাজারের লিস্ট -->
+                <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-5">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-list text-emerald-600"></i> আজকের বাজারের লিস্ট
+                        </h3>
+                        <button onclick="copyBazarList()" class="px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold transition flex items-center gap-1.5">
+                            <i class="fa-regular fa-copy"></i> লিস্ট কপি করুন
+                        </button>
+                    </div>
+
+                    <div id="bazar-status-badge" class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium">
+                        <!-- স্ট্যাটাস মেসেজ এখানে আসবে -->
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-slate-500 text-xs uppercase">
+                                    <th class="py-3 px-2">বাজারের আইটেম</th>
+                                    <th class="py-3 px-2">পরিমাণ</th>
+                                    <th class="py-3 px-2 text-right">সম্ভাব্য দাম</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bazar-items-body" class="divide-y divide-slate-100 text-sm">
+                                <!-- ডায়নামিক আইটেম -->
+                            </tbody>
+                            <tfoot>
+                                <tr class="border-t-2 border-slate-200 font-bold text-base bg-slate-50">
+                                    <td colspan="2" class="py-3.5 px-3 text-slate-800">মোট সম্ভাব্য বাজার খরচ:</td>
+                                    <td id="bazar-total-cost" class="py-3.5 px-3 text-right text-emerald-600">৳ ০</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ডান কলাম: রান্নার মেনু আইডিয়া -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-6 sm:p-8 border border-amber-200/70 shadow-sm space-y-5">
+                        <h3 class="text-xl font-bold text-amber-900 flex items-center gap-2">
+                            <i class="fa-solid fa-utensils text-amber-600"></i> আজকের রান্নার মেনু আইডিয়া
+                        </h3>
+                        
+                        <div class="space-y-4" id="menu-ideas-container">
+                            <!-- দুপুর ও রাতের মেনু কার্ড -->
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-white/80 border border-amber-200/60 text-xs text-slate-600 leading-relaxed">
+                            <strong class="text-amber-800"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> স্মার্ট টিপস:</strong>
+                            মৌসুমি শাকসবজি কিনলে খরচ ২০% পর্যন্ত কমে এবং পুষ্টিগুণও বেশি পাওয়া যায়। চাল ও তেল একবারে মাসিক হিসেবে কিনলে প্রতিদিনের বাজারের চাপ কমে।
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- ৩. সংসার ও ভবিষ্যৎ সেভিংস সিমুলেটর (SAVINGS SIMULATOR)     -->
+        <!-- ========================================================= -->
+        <section id="section-savings" class="tab-section hidden fade-in space-y-8">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-piggy-bank"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">সংসার ও ভবিষ্যৎ সেভিংস সিমুলেটর</h2>
+                            <p class="text-sm text-slate-500">শহর ও মাসিক আয় অনুযায়ী খরচের স্লাইডার ঘুরিয়ে লাইভ সঞ্চয় হিসাব দেখুন</p>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('home')" class="self-start sm:self-auto px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> ফিরে যান
+                    </button>
+                </div>
+
+                <!-- মাসিক আয় ও শহর সিলেকশন -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">আপনার মাসিক মোট আয় (টাকা)</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3 text-slate-400 font-bold">৳</span>
+                            <input type="number" id="monthly-income" value="50000" min="5000" step="1000" oninput="updateSavingsSimulation()" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none font-bold text-lg text-slate-800">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">বসবাসের শহর (শহর ভেদে খরচের আদর্শ মান সেট হবে)</label>
+                        <select id="city-select" onchange="applyCityPreset()" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none font-semibold text-slate-800 bg-white">
+                            <option value="dhaka">ঢাকা (মেট্রোপলিটন - উচ্চ খরচ)</option>
+                            <option value="chittagong">চট্টগ্রাম / সিলেট (বিভাগীয় শহর - মাঝারি খরচ)</option>
+                            <option value="district">জেলা শহর (সাশ্রয়ী জীবনযাত্রা)</option>
+                            <option value="village">উপজেলা / গ্রাম (সবচেয়ে কম খরচ)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- স্লাইডার ও লাইভ চার্ট -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- বাম কলাম: খরচের স্লাইডারসমূহ -->
+                <div class="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
+                    <h3 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-3">মাসিক খরচের খাতসমূহ নিয়ন্ত্রণ করুন</h3>
+
+                    <!-- স্লাইডার ১: বাড়ি ভাড়া -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm font-semibold">
+                            <span class="text-slate-700"><i class="fa-solid fa-house-chimney text-indigo-500 mr-1.5"></i>বাড়ি ভাড়া ও ইউটিলিটি বিল</span>
+                            <span class="text-indigo-600 font-bold">৳ <span id="val-rent">18000</span></span>
+                        </div>
+                        <input type="range" id="slider-rent" min="0" max="100000" step="500" value="18000" oninput="updateSavingsSimulation()">
+                    </div>
+
+                    <!-- স্লাইডার ২: বাজার ও খাবার -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm font-semibold">
+                            <span class="text-slate-700"><i class="fa-solid fa-bowl-food text-emerald-500 mr-1.5"></i>বাজার, খাবার ও গ্রোসারি</span>
+                            <span class="text-emerald-600 font-bold">৳ <span id="val-food">12000</span></span>
+                        </div>
+                        <input type="range" id="slider-food" min="1000" max="80000" step="500" value="12000" oninput="updateSavingsSimulation()">
+                    </div>
+
+                    <!-- স্লাইডার ৩: যাতায়াত ও শিক্ষা -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm font-semibold">
+                            <span class="text-slate-700"><i class="fa-solid fa-bus text-amber-500 mr-1.5"></i>যাতায়াত, শিক্ষা ও চিকিৎসা</span>
+                            <span class="text-amber-600 font-bold">৳ <span id="val-transport">6000</span></span>
+                        </div>
+                        <input type="range" id="slider-transport" min="0" max="50000" step="500" value="6000" oninput="updateSavingsSimulation()">
+                    </div>
+
+                    <!-- স্লাইডার ৪: অন্যান্য ও শপিং -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm font-semibold">
+                            <span class="text-slate-700"><i class="fa-solid fa-bag-shopping text-pink-500 mr-1.5"></i>শপিং, ইন্টারনেট ও অন্যান্য</span>
+                            <span class="text-pink-600 font-bold">৳ <span id="val-others">4000</span></span>
+                        </div>
+                        <input type="range" id="slider-others" min="0" max="50000" step="500" value="4000" oninput="updateSavingsSimulation()">
+                    </div>
+                </div>
+
+                <!-- ডান কলাম: চার্ট ও ভবিষ্যৎ সঞ্চয় প্রজেকশন -->
+                <div class="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-100">
+                            <span class="text-xs font-semibold text-rose-600 block">মোট মাসিক খরচ</span>
+                            <span id="total-expense-display" class="text-xl sm:text-2xl font-bold text-rose-700 mt-1 block">৳ ৪০,০০০</span>
+                        </div>
+                        <div id="savings-card-bg" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                            <span id="savings-card-label" class="text-xs font-semibold text-emerald-600 block">মাসিক নিট সঞ্চয়</span>
+                            <span id="monthly-savings-display" class="text-xl sm:text-2xl font-bold text-emerald-700 mt-1 block">৳ ১০,০০০</span>
+                        </div>
+                    </div>
+
+                    <!-- ডোনাট চার্ট -->
+                    <div class="relative h-56 w-full flex items-center justify-center">
+                        <canvas id="savingsChart"></canvas>
+                    </div>
+
+                    <!-- ভবিষ্যৎ প্রজেকশন বক্স -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white space-y-3">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-blue-100"><i class="fa-solid fa-calendar-check mr-1.5"></i>১ বছরে মোট সঞ্চয়:</span>
+                            <span id="yearly-savings-display" class="font-bold text-lg">৳ ১,২০,০০০</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm border-t border-white/15 pt-2.5">
+                            <span class="text-blue-100"><i class="fa-solid fa-seedling mr-1.5"></i>৫ বছরে (৮% মুনাফাসহ সম্ভাব্য):</span>
+                            <span id="five-year-savings-display" class="font-bold text-xl text-amber-300">৳ ৭,৩৪,০০০</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- ৪. বাড়ি তৈরির খরচ ক্যালকুলেটর (HOUSE CONSTRUCTION CALC)   -->
+        <!-- ========================================================= -->
+        <section id="section-house" class="tab-section hidden fade-in space-y-8">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">বাড়ি তৈরির খরচ ক্যালকুলেটর</h2>
+                            <p class="text-sm text-slate-500">জমির পরিমাণ ও তলার সংখ্যা অনুযায়ী ইট, সিমেন্ট, রড ও খরচের আনুমানিক হিসাব</p>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('home')" class="self-start sm:self-auto px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> ফিরে যান
+                    </button>
+                </div>
+
+                <!-- ইনপুট কন্ট্রোল -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">জমির একক</label>
+                        <select id="land-unit" onchange="calculateHouseCost()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none font-semibold text-slate-800 bg-white">
+                            <option value="decimal">শতাংশ / ডিসিমেল (১ শতাংশ = ৪৩৫.৬ বর্গফুট)</option>
+                            <option value="katha">কাঠা (১ কাঠা = ৭২০ বর্গফুট)</option>
+                            <option value="sqft">বর্গফুট (Square Feet)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">জমির পরিমাণ (প্রতি তলার ফ্লোর এরিয়া)</label>
+                        <input type="number" id="land-amount" value="3" min="0.5" step="0.5" oninput="calculateHouseCost()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none font-bold text-slate-800">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">তলার সংখ্যা (Floor)</label>
+                        <select id="floor-count" onchange="calculateHouseCost()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none font-semibold text-slate-800 bg-white">
+                            <option value="1">১ তলা (একতলা ফাউন্ডেশন)</option>
+                            <option value="2" selected>২ তলা (ডুপ্লেক্স / ২ তলা)</option>
+                            <option value="3">৩ তলা ভবন</option>
+                            <option value="4">৪ তলা ভবন</option>
+                            <option value="5">৫ তলা ভবন</option>
+                            <option value="6">৬ তলা ভবন</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">নির্মাণ মান (Quality)</label>
+                        <select id="build-quality" onchange="calculateHouseCost()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none font-semibold text-slate-800 bg-white">
+                            <option value="standard">স্ট্যান্ডার্ড ফিনিশিং (৳ ২,২০০ / বর্গফুট)</option>
+                            <option value="economy">সাশ্রয়ী / সাধারণ মান (৳ ১,৮০০ / বর্গফুট)</option>
+                            <option value="luxury">লাক্সারি / প্রিমিয়াম মান (৳ ২,৮০০ / বর্গফুট)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ফলাফল কার্ডসমূহ -->
+            <div class="space-y-6">
+                <!-- সারসংক্ষেপ ব্যানার -->
+                <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-3xl p-6 sm:p-8 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-white/20 text-xs font-semibold">সর্বমোট নির্মাণ এরিয়া: <span id="total-sqft-display">২,৬১৪</span> বর্গফুট</span>
+                        <h3 class="text-lg sm:text-xl font-medium text-amber-100 mt-3">সম্পূর্ণ বাড়ি তৈরির আনুমানিক মোট খরচ</h3>
+                        <div id="house-total-cost" class="text-3xl sm:text-5xl font-bold mt-1">৳ ৫৭,৫০,৮০০</div>
+                    </div>
+                    <div class="bg-white/15 backdrop-blur-sm border border-white/25 rounded-2xl p-4 text-sm space-y-1.5 max-w-xs">
+                        <p class="font-semibold"><i class="fa-solid fa-circle-info mr-1"></i> খরচের বিভাজন:</p>
+                        <p class="text-amber-50 text-xs">• নির্মাণ সামগ্রী (ইট, রড, সিমেন্ট, বালু): ~৬৫%</p>
+                        <p class="text-amber-50 text-xs">• মিস্ত্রি ও লেবার খরচ: ~২০%</p>
+                        <p class="text-amber-50 text-xs">• রঙ, টাইলস, ইলেকট্রিক ও স্যানিটারি: ~১৫%</p>
+                    </div>
+                </div>
+
+                <!-- মালামালের গ্রিড -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <!-- ইট -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0">
+                            <i class="fa-solid fa-cubes-stacked"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-500 block">প্রয়োজনীয় ইট (১ম শ্রেণি)</span>
+                            <span id="mat-bricks" class="text-2xl font-bold text-slate-800 block mt-0.5">৪৭,০৫০ টি</span>
+                            <span id="cost-bricks" class="text-xs font-medium text-red-600">আনুমানিক ৳ ৬,১১,৬৫০</span>
+                        </div>
+                    </div>
+
+                    <!-- সিমেন্ট -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-slate-200 text-slate-700 flex items-center justify-center text-2xl shrink-0">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-500 block">প্রয়োজনীয় সিমেন্ট</span>
+                            <span id="mat-cement" class="text-2xl font-bold text-slate-800 block mt-0.5">১,০৪৬ বস্তা</span>
+                            <span id="cost-cement" class="text-xs font-medium text-slate-600">আনুমানিক ৳ ৫,৭৫,৩০০</span>
+                        </div>
+                    </div>
+
+                    <!-- রড -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl shrink-0">
+                            <i class="fa-solid fa-bars-staggered"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-500 block">প্রয়োজনীয় রড (৬০ গ্রেড)</span>
+                            <span id="mat-rod" class="text-2xl font-bold text-slate-800 block mt-0.5">৯.১৫ টন</span>
+                            <span id="cost-rod" class="text-xs font-medium text-indigo-600">আনুমানিক ৳ ৮,৬৯,২৫০</span>
+                        </div>
+                    </div>
+
+                    <!-- বালু ও পাথর/খোয়া -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl shrink-0">
+                            <i class="fa-solid fa-mound"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-500 block">বালু ও পাথর/খোয়া</span>
+                            <span id="mat-sand" class="text-2xl font-bold text-slate-800 block mt-0.5">৩,১৩৭ CFT</span>
+                            <span id="cost-sand" class="text-xs font-medium text-amber-600">আনুমানিক ৳ ৩,৭৬,৪৪০</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ফুটার -->
+    <footer class="bg-white border-t border-slate-200/80 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700">স্মার্ট লাইফ ডিসিশন মেকার</span>
+                <span>— দৈনন্দিন জীবনের স্মার্ট সঙ্গী</span>
+            </div>
+            <p class="text-xs text-center sm:text-right">
+                * বিঃদ্রঃ বাজারদর ও নির্মাণ সামগ্রীর মূল্য স্থান ও সময়ভেদে কিছুটা পরিবর্তিত হতে পারে।
+            </p>
+        </div>
+    </footer>
+
+    <!-- জাভাস্ক্রিপ্ট লজিক -->
+    <script>
+        // ==========================================
+        // ১. বাংলা সংখ্যা রূপান্তর ও ফরম্যাটিং হেল্পার
+        // ==========================================
+        const engToBnDigits = {
+            '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
+            '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'
+        };
+
+        function toBn(num) {
+            if (num === null || num === undefined) return '০';
+            // কমা ফরম্যাটিংসহ বাংলা সংখ্যায় রূপান্তর
+            const formatted = Number(Math.round(num)).toLocaleString('en-IN');
+            return formatted.replace(/[0-9]/g, d => engToBnDigits[d]);
+        }
+
+        function toBnDecimal(num) {
+            const formatted = Number(num).toFixed(2);
+            return formatted.replace(/[0-9]/g, d => engToBnDigits[d]);
+        }
+
+        // কাস্টম টোস্ট নোটিফিকেশন
+        function showToast(msg) {
+            const toast = document.getElementById('toast-box');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        // ==========================================
+        // ২. ট্যাব সুইচিং এবং নেভিগেশন লজিক
+        // ==========================================
+        function switchTab(tabName) {
+            // সব সেকশন লুকানো
+            document.querySelectorAll('.tab-section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
+
+            // নির্বাচিত সেকশন দেখানো
+            const targetSection = document.getElementById('section-' + tabName);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+
+            // ডেস্কটপ বাটন অ্যাক্টিভ স্টাইল আপডেট
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById('nav-' + tabName);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                activeBtn.classList.remove('text-slate-600');
+            }
+
+            // সেভিংস ট্যাবে গেলে চার্ট রিসাইজ/আপডেট করা
+            if (tabName === 'savings' && savingsChartInstance) {
+                savingsChartInstance.update();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            menu.classList.toggle('hidden');
+            if (menu.classList.contains('hidden')) {
+                icon.classList.replace('fa-xmark', 'fa-bars');
+            } else {
+                icon.classList.replace('fa-bars', 'fa-xmark');
+            }
+        }
+
+        // ==========================================
+        // ৩. স্মার্ট বাজার ও মেনু জেনারেটর লজিক
+        // ==========================================
+        let currentBazarText = "";
+
+        function generateBazarPlan() {
+            const budget = parseFloat(document.getElementById('bazar-budget').value) || 500;
+            const members = parseInt(document.getElementById('bazar-members').value) || 4;
+            const type = document.getElementById('bazar-type').value;
+
+            const perHead = budget / members;
+            let items = [];
+            let lunchMenu = "";
+            let dinnerMenu = "";
+            let statusMsg = "";
+
+            // বাজেট ও ধরন অনুযায়ী ডায়নামিক আইটেম ও মেনু নির্বাচন
+            if (type === 'special' || perHead >= 220) {
+                const chickenKg = Math.max(0.5, (members * 0.25)).toFixed(2);
+                const chickenCost = Math.round(chickenKg * 210);
+                const polaoRiceKg = Math.max(0.5, (members * 0.2)).toFixed(2);
+                const riceCost = Math.round(polaoRiceKg * 130);
+                const vegCost = Math.round(budget * 0.15);
+                const spiceOilCost = Math.max(60, budget - (chickenCost + riceCost + vegCost));
+
+                items = [
+                    { name: 'ব্রয়লার / সোনালি মুরগি', qty: `${toBnDecimal(chickenKg)} কেজি`, price: chickenCost },
+                    { name: 'চিনিগুঁড়া পোলাও চাল / সরু চাল', qty: `${toBnDecimal(polaoRiceKg)} কেজি`, price: riceCost },
+                    { name: 'শসা, গাজর, টমেটো ও কাঁচামরিচ (সালাদ)', qty: '৫০০ গ্রাম', price: vegCost },
+                    { name: 'পেঁয়াজ, আদা-রসুন বাটা, তেল ও গরম মসলা', qty: 'প্রয়োজনমতো', price: spiceOilCost }
+                ];
+                lunchMenu = "সাদা পোলাও বা গরম ভাত, মুরগির রোস্ট/ভুনা এবং স্পেশাল সালাদ।";
+                dinnerMenu = "দুপুরের অবশিষ্ট মুরগির মাংস, পাতলা মসুর ডাল ও গরম ভাত/রুটি।";
+                statusMsg = `চমৎকার বাজেট! ${toBn(members)} জনের জন্য আজকের স্পেশাল ভোজের পূর্ণাঙ্গ বাজার তালিকা তৈরি করা হয়েছে।`;
+            } 
+            else if (type === 'budget' || perHead < 110) {
+                const eggCount = Math.max(4, members * 2);
+                const eggCost = Math.round(eggCount * 12.5);
+                const potatoKg = Math.max(1, Math.ceil(members * 0.25));
+                const potatoCost = potatoKg * 45;
+                const dalGram = members * 60;
+                const dalCost = Math.round((dalGram / 1000) * 140);
+                const shakBundle = Math.max(1, Math.ceil(members / 2));
+                const shakCost = shakBundle * 25;
+                const remaining = Math.max(30, budget - (eggCost + potatoCost + dalCost + shakCost));
+
+                items = [
+                    { name: 'ফার্মের মুরগির ডিম', qty: `${toBn(eggCount)} টি`, price: eggCost },
+                    { name: 'আলু (ভর্তা ও তরকারির জন্য)', qty: `${toBn(potatoKg)} কেজি`, price: potatoCost },
+                    { name: 'মসুর ডাল', qty: `${toBn(dalGram)} গ্রাম`, price: dalCost },
+                    { name: 'লাল শাক / কলমি শাক', qty: `${toBn(shakBundle)} আঁটি`, price: shakCost },
+                    { name: 'পেঁয়াজ, কাঁচামরিচ, রসুন ও ধনেপাতা', qty: '২৫০ গ্রাম', price: remaining }
+                ];
+                lunchMenu = "গরম ভাত, আলু ভর্তা, ঘন মসুর ডাল এবং রসুন ফোড়নে শাক ভাজি।";
+                dinnerMenu = "আলু দিয়ে ডিমের ঝোল (ডিম ভুনা) এবং গরম ভাত।";
+                statusMsg = `সাশ্রয়ী ও পুষ্টিকর প্ল্যান! কম বাজেটে ${toBn(members)} জনের জন্য দারুণ তৃপ্তিদায়ক মেনু সাজানো হয়েছে।`;
+            } 
+            else {
+                // ব্যালেন্সড মেনু (মাছ + সবজি + ডাল)
+                const fishKg = Math.max(0.5, (members * 0.18)).toFixed(2);
+                const fishCost = Math.round(fishKg * 280);
+                const vegKg = Math.max(1, Math.ceil(members * 0.25));
+                const vegCost = vegKg * 60;
+                const dalCost = Math.round(members * 15);
+                const spiceCost = Math.max(40, budget - (fishCost + vegCost + dalCost));
+
+                items = [
+                    { name: 'রুই / তেলাপিয়া / পাঙ্গাস মাছ', qty: `${toBnDecimal(fishKg)} কেজি`, price: fishCost },
+                    { name: 'মৌসুমি সবজি (পটল / করলা / পেঁপে / আলু)', qty: `${toBn(vegKg)} কেজি`, price: vegCost },
+                    { name: 'মসুর ডাল ও কাঁচামরিচ', qty: '২৫০ গ্রাম', price: dalCost },
+                    { name: 'পেঁয়াজ, টমেটো, ধনেপাতা ও তেল-মসলা', qty: 'প্রয়োজনমতো', price: spiceCost }
+                ];
+                lunchMenu = "সাদা ভাত, আলু-টমেটো দিয়ে মাছের ঝোল এবং পাঁচমিশালি সবজি ভাজি।";
+                dinnerMenu = "পাতলা মসুর ডাল, ভাজা মাছ (অথবা সবজি) এবং গরম ভাত।";
+                statusMsg = `আদর্শ ব্যালেন্সড বাজেট! ${toBn(members)} জনের জন্য মাছ, সবজি ও ডালের পুষ্টিকর তালিকা তৈরি হয়েছে।`;
+            }
+
+            // টেবিল রেন্ডার
+            const tbody = document.getElementById('bazar-items-body');
+            tbody.innerHTML = '';
+            let totalCalculated = 0;
+            currentBazarText = `আজকের বাজারের লিস্ট (বাজেট: ৳${toBn(budget)}, সদস্য: ${toBn(members)} জন):\n-----------------------------------\n`;
+
+            items.forEach(item => {
+                totalCalculated += item.price;
+                currentBazarText += `• ${item.name} (${item.qty}) - ৳${toBn(item.price)}\n`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3 px-2 font-medium text-slate-800">${item.name}</td>
+                        <td class="py-3 px-2 text-slate-600">${item.qty}</td>
+                        <td class="py-3 px-2 text-right font-semibold text-slate-800">৳ ${toBn(item.price)}</td>
+                    </tr>
+                `;
+            });
+
+            currentBazarText += `-----------------------------------\nমোট সম্ভাব্য খরচ: ৳${toBn(totalCalculated)}\n\nদুপুরের মেনু: ${lunchMenu}\nরাতের মেনু: ${dinnerMenu}`;
+
+            document.getElementById('bazar-total-cost').innerText = `৳ ${toBn(totalCalculated)}`;
+            document.getElementById('bazar-status-badge').innerHTML = `<i class="fa-solid fa-circle-check mr-1.5"></i> ${statusMsg}`;
+
+            // মেনু কার্ড রেন্ডার
+            document.getElementById('menu-ideas-container').innerHTML = `
+                <div class="p-4 rounded-2xl bg-white border border-amber-200 shadow-sm">
+                    <div class="flex items-center gap-2 text-amber-700 font-bold text-sm mb-1">
+                        <i class="fa-solid fa-sun text-amber-500"></i> দুপুরের খাবার (Lunch)
+                    </div>
+                    <p class="text-slate-700 text-sm leading-relaxed">${lunchMenu}</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-white border border-indigo-100 shadow-sm">
+                    <div class="flex items-center gap-2 text-indigo-700 font-bold text-sm mb-1">
+                        <i class="fa-solid fa-moon text-indigo-500"></i> রাতের খাবার (Dinner)
+                    </div>
+                    <p class="text-slate-700 text-sm leading-relaxed">${dinnerMenu}</p>
+                </div>
+            `;
+        }
+
+        function copyBazarList() {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = currentBazarText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('বাজারের লিস্ট ও মেনু ক্লিপবোর্ডে কপি হয়েছে!');
+        }
+
+        // ==========================================
+        // ৪. সংসার ও ভবিষ্যৎ সেভিংস সিমুলেটর লজিক
+        // ==========================================
+        let savingsChartInstance = null;
+
+        function applyCityPreset() {
+            const income = parseFloat(document.getElementById('monthly-income').value) || 50000;
+            const city = document.getElementById('city-select').value;
+
+            let rentRatio = 0.36;
+            let foodRatio = 0.24;
+            let transportRatio = 0.12;
+            let othersRatio = 0.08;
+
+            if (city === 'dhaka') {
+                rentRatio = 0.38; foodRatio = 0.25; transportRatio = 0.12; othersRatio = 0.08;
+            } else if (city === 'chittagong') {
+                rentRatio = 0.30; foodRatio = 0.23; transportRatio = 0.10; othersRatio = 0.08;
+            } else if (city === 'district') {
+                rentRatio = 0.20; foodRatio = 0.22; transportRatio = 0.08; othersRatio = 0.07;
+            } else if (city === 'village') {
+                rentRatio = 0.05; foodRatio = 0.20; transportRatio = 0.07; othersRatio = 0.06;
+            }
+
+            document.getElementById('slider-rent').value = Math.round((income * rentRatio) / 500) * 500;
+            document.getElementById('slider-food').value = Math.round((income * foodRatio) / 500) * 500;
+            document.getElementById('slider-transport').value = Math.round((income * transportRatio) / 500) * 500;
+            document.getElementById('slider-others').value = Math.round((income * othersRatio) / 500) * 500;
+
+            updateSavingsSimulation();
+        }
+
+        function updateSavingsSimulation() {
+            const income = parseFloat(document.getElementById('monthly-income').value) || 0;
+            const rent = parseFloat(document.getElementById('slider-rent').value) || 0;
+            const food = parseFloat(document.getElementById('slider-food').value) || 0;
+            const transport = parseFloat(document.getElementById('slider-transport').value) || 0;
+            const others = parseFloat(document.getElementById('slider-others').value) || 0;
+
+            // স্লাইডার ভ্যালু আপডেট
+            document.getElementById('val-rent').innerText = toBn(rent);
+            document.getElementById('val-food').innerText = toBn(food);
+            document.getElementById('val-transport').innerText = toBn(transport);
+            document.getElementById('val-others').innerText = toBn(others);
+
+            const totalExpense = rent + food + transport + others;
+            const monthlySavings = income - totalExpense;
+
+            document.getElementById('total-expense-display').innerText = `৳ ${toBn(totalExpense)}`;
+
+            const savingsBg = document.getElementById('savings-card-bg');
+            const savingsLabel = document.getElementById('savings-card-label');
+            const savingsDisplay = document.getElementById('monthly-savings-display');
+
+            if (monthlySavings >= 0) {
+                savingsBg.className = "p-4 rounded-2xl bg-emerald-50 border border-emerald-100";
+                savingsLabel.className = "text-xs font-semibold text-emerald-600 block";
+                savingsLabel.innerText = "মাসিক নিট সঞ্চয়";
+                savingsDisplay.className = "text-xl sm:text-2xl font-bold text-emerald-700 mt-1 block";
+                savingsDisplay.innerText = `৳ ${toBn(monthlySavings)}`;
+            } else {
+                savingsBg.className = "p-4 rounded-2xl bg-red-50 border border-red-200";
+                savingsLabel.className = "text-xs font-semibold text-red-600 block";
+                savingsLabel.innerText = "মাসিক ঘাটতি (ঋণ)";
+                savingsDisplay.className = "text-xl sm:text-2xl font-bold text-red-700 mt-1 block";
+                savingsDisplay.innerText = `- ৳ ${toBn(Math.abs(monthlySavings))}`;
+            }
+
+            // ১ বছর ও ৫ বছরের সঞ্চয় (বার্ষিক ৮% চক্রবৃদ্ধি ডিপিএস মুনাফাসহ)
+            const yearlySavings = Math.max(0, monthlySavings * 12);
+            const monthlyRate = 0.08 / 12;
+            const months = 60;
+            const fiveYearFutureValue = monthlySavings > 0 
+                ? monthlySavings * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate)
+                : 0;
+
+            document.getElementById('yearly-savings-display').innerText = `৳ ${toBn(yearlySavings)}`;
+            document.getElementById('five-year-savings-display').innerText = `৳ ${toBn(fiveYearFutureValue)}`;
+
+            // চার্ট আপডেট
+            const chartSavingsValue = Math.max(0, monthlySavings);
+            if (savingsChartInstance) {
+                savingsChartInstance.data.datasets[0].data = [rent, food, transport, others, chartSavingsValue];
+                savingsChartInstance.update();
+            }
+        }
+
+        function initSavingsChart() {
+            const ctx = document.getElementById('savingsChart').getContext('2d');
+            savingsChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['বাড়ি ভাড়া', 'বাজার ও খাবার', 'যাতায়াত ও শিক্ষা', 'অন্যান্য', 'মাসিক সঞ্চয়'],
+                    datasets: [{
+                        data: [18000, 12000, 6000, 4000, 10000],
+                        backgroundColor: [
+                            '#6366f1', // Indigo
+                            '#10b981', // Emerald
+                            '#f59e0b', // Amber
+                            '#ec4899', // Pink
+                            '#0ea5e9'  // Sky Blue (Savings)
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                font: { family: 'Hind Siliguri', size: 12 },
+                                boxWidth: 12,
+                                padding: 12
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // ৫. বাড়ি তৈরির খরচ ক্যালকুলেটর লজিক
+        // ==========================================
+        function calculateHouseCost() {
+            const unit = document.getElementById('land-unit').value;
+            const amount = parseFloat(document.getElementById('land-amount').value) || 0;
+            const floors = parseInt(document.getElementById('floor-count').value) || 1;
+            const quality = document.getElementById('build-quality').value;
+
+            // জমিকে বর্গফুটে রূপান্তর
+            let singleFloorSqft = amount;
+            if (unit === 'decimal') {
+                singleFloorSqft = amount * 435.6;
+            } else if (unit === 'katha') {
+                singleFloorSqft = amount * 720;
+            }
+
+            const totalSqft = singleFloorSqft * floors;
+
+            // নির্মাণ মান অনুযায়ী প্রতি বর্গফুট খরচ (বাংলাদেশের বর্তমান বাজারদর অনুযায়ী)
+            let ratePerSqft = 2200; // Standard
+            if (quality === 'economy') ratePerSqft = 1800;
+            if (quality === 'luxury') ratePerSqft = 2800;
+
+            const totalCost = totalSqft * ratePerSqft;
+
+            // স্ট্যান্ডার্ড ইঞ্জিনিয়ারিং থাম্ব-রুল অনুযায়ী মালামালের হিসাব (প্রতি বর্গফুটে)
+            const totalBricks = Math.round(totalSqft * 18); // গাঁথুনি ও খোয়াসহ ~১৮টি ইট/বর্গফুট
+            const totalCementBags = Math.round(totalSqft * 0.40); // ~০.৪০ বস্তা সিমেন্ট/বর্গফুট
+            const totalRodTons = (totalSqft * 3.5) / 1000; // ~৩.৫ কেজি রড/বর্গফুট -> টন
+            const totalSandCft = Math.round(totalSqft * 1.2); // ~১.২ CFT বালু/বর্গফুট
+
+            // মালামালের সম্ভাব্য দাম
+            const bricksCost = totalBricks * 13; // প্রতি ইট ১৩ টাকা
+            const cementCost = totalCementBags * 550; // প্রতি বস্তা ৫৫০ টাকা
+            const rodCost = Math.round(totalRodTons * 95000); // প্রতি টন ৯৫,০০০ টাকা
+            const sandCost = totalSandCft * 45; // গড় প্রতি CFT ৪৫ টাকা
+
+            // UI আপডেট
+            document.getElementById('total-sqft-display').innerText = toBn(totalSqft);
+            document.getElementById('house-total-cost').innerText = `৳ ${toBn(totalCost)}`;
+
+            document.getElementById('mat-bricks').innerText = `${toBn(totalBricks)} টি`;
+            document.getElementById('cost-bricks').innerText = `আনুমানিক ৳ ${toBn(bricksCost)}`;
+
+            document.getElementById('mat-cement').innerText = `${toBn(totalCementBags)} বস্তা`;
+            document.getElementById('cost-cement').innerText = `আনুমানিক ৳ ${toBn(cementCost)}`;
+
+            document.getElementById('mat-rod').innerText = `${toBnDecimal(totalRodTons)} টন`;
+            document.getElementById('cost-rod').innerText = `আনুমানিক ৳ ${toBn(rodCost)}`;
+
+            document.getElementById('mat-sand').innerText = `${toBn(totalSandCft)} CFT`;
+            document.getElementById('cost-sand').innerText = `আনুমানিক ৳ ${toBn(sandCost)}`;
+        }
+
+        // পেজ লোড হলে সব টুলের ডিফল্ট মান ইনিশিয়ালাইজ করা
+        window.addEventListener('DOMContentLoaded', () => {
+            generateBazarPlan();
+            initSavingsChart();
+            updateSavingsSimulation();
+            calculateHouseCost();
+        });
+    </script>
+</body>
+</html>
